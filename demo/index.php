@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title><?php echo str_replace("<br>", "", $backend->__("title")); ?></title>
+    <title><?php echo strtolower(strip_tags($backend->__("title"))); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -14,6 +14,10 @@
 
     <link href="css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
+        .navbar .brand {
+            font-size: 1em;
+        }
+
         body {
             padding-top: 60px;
             padding-bottom: 40px;
@@ -48,8 +52,8 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="hero-unit">
         <h1 data-slug="title"><?php echo $backend->__("title"); ?></h1>
-        <p data-slug="maindesc"><?php echo $backend->__("maindesc"); ?></p>
-        <p><a class="btn btn-primary btn-large" data-slug="learnmore"><?php echo $backend->__("learnmore"); ?></a></p>
+        <p data-permissions="simpleformat" data-slug="maindesc"><?php echo $backend->__("maindesc"); ?></p>
+        <p><a href="http://www.github.com/holzweg/rteditable" target="_blank" class="btn btn-primary btn-large"><?php echo $backend->__("learnmore"); ?></a></p>
       </div>
 
       <ul class="breadcrumb">
@@ -80,7 +84,7 @@
       <footer>
         <p data-slug="copyright"><?php echo $backend->__("copyright"); ?></p>
         <p class="well" data-slug="title"><?php echo $backend->__("title"); ?></p>
-        <p><a href="index.php?reset" class="btn btn-danger btn-large">Reset all translations</a></p>
+        <p><a href="index.php?reset" class="btn btn-danger btn-large">Restore all translations</a></p>
       </footer>
 
     </div>
@@ -104,7 +108,13 @@
     <script type="text/javascript" charset="utf-8">
         $().ready(function() {
             $('[data-slug]').rteditable({
-                url: "index.php?post=true"
+                url: "index.php?post=true",
+                permissions: {
+                    simpleformat: {
+                        format: true,
+                        newline: true
+                    }
+                }
             });
         });
     </script>

@@ -2,25 +2,42 @@
 
     $.fn.rteditable = function(options) {
 
+        // Set defaults
         var defaults = {
-            url: '/'
+            url: '/',
+            permissions: {},
+            shortcuts: {}
         };
+        var defaultPermissions = {
+            default: {
+                newline: false,
+                paste: false,
+                cut: false,
+                format: false,
+                dragover: false,
+                drop: false
+            }
+        }
+        var defaultShortcuts = {
+            "#b": "bold",
+            "#i": "italic",
+            "#u": "underline",
+            "#-": "decreaseFontSize",
+            "#+": "increaseFontSize",
+            "#r": "removeFormat",
+            "#s": "strikeThrough"
+        }
 
+        // Create options
         var options = $.extend(defaults, options);
+        options.permissions = $.extend(defaultPermissions, options.permissions);
+        options.shortcuts = $.extend(defaultShortcuts, options.shortcuts);
 
         // Create selector
         $("body").append("<div id='rt-sel'>input</div>");
         $("body").append("<div id='rt-ol'></div>");
         var $sel = $("div#rt-sel");
         var $ol = $("div#rt-ol");
-
-        $which = {
-            enter: 13,
-            a: 97,
-            b: 98,
-            i: 105,
-            u: 117
-        }
 
         var $i = {
             highlighted: null,
@@ -112,7 +129,7 @@
                 range.collapse(false);
                 var rect = range.getBoundingClientRect();
 
-                if(rect.right == 0 && rect.bottom == 0) {
+                if(rect == null || (rect.right == 0 && rect.bottom == 0)) {
 
                     // todo: check if valid
                     range.setEnd(range.endContainer, range.endOffset + 1);
@@ -137,6 +154,17 @@
         $tmp = {};
 
         $ef = {
+            can: function($this, action) {
+                // Fetch default permissions
+                var permissions = options.permissions.default;
+                // Append override permissions
+                if($this.data("permissions") && options.permissions[$this.data("permissions")]) {
+                    permissions = $.extend(permissions, options.permissions[$this.data("permissions")]);
+                }
+                // Return true/false
+                return permissions[action];
+
+            },
             getCharCount: function(node) {
                 var textNodes = $ef.getTextNodes(node);
                 var charCount = 0;
@@ -177,7 +205,12 @@
                 return false;
 
             },
-            select: function($this, start, end) {
+            select: function(start, end) {
+
+                $this = $i.editing;
+                if(!$i.editing) {
+                    return false;
+                }
 
                 // Get char count
                 var charCount = $ef.getCharCount($this[0]);
@@ -257,47 +290,81 @@
                 $f.updateOutline();
             });
 
+            $this.bind("cut paste dragover drop", function(event) {
+                if(!$ef.can($this, event.type)) {
+                    event.preventDefault();
+                }
+            });
+
             $this.keypress(function(event) {
                 $this = $(this);
-                if(event.metaKey) {
-                    switch(event.which) {
-                        case $which.a:
+
+                // Character Map
+                var mapString = "";
+                if(event.ctrlKey) { mapString = mapString + "$"; }
+                if(event.altKey) { mapString = mapString + "@"; }
+                if(event.metaKey) { mapString = mapString +  "#"; }
+                if(mapString != "") {
+                    var character = String.fromCharCode(event.which);
+                    var matches = character.match(/[\w+-]{1}/g);
+                    if(matches != null && matches.length && matches[0] != "") {
+                        var mapString = mapString + matches[0];
+
+                        // Check if key binding is registered
+                        if(options.shortcuts[mapString]) {
+                            var commandArray = options.shortcuts[mapString].split("|");
+                            var command = commandArray.shift();
+                            var argument = commandArray.shift();
+                            document.execCommand(command, false);
                             event.preventDefault();
-                            $ef.select($this, "all");
-                            break;
-                        case $which.b:
-                            event.preventDefault();
-                            document.execCommand("bold", false);
-                            break;
-                        case $which.i:
-                            event.preventDefault();
-                            document.execCommand("italic", false);
-                            break;
-                        case $which.u:
-                            event.preventDefault();
-                            document.execCommand("underline", false);
-                            break;
-                        case 0:
-                            switch(event.keyCode) {
-                                case 38:
-                                    event.preventDefault();
-                                    $ef.select($this, "start");
-                                    break;
-                                case 40:
-                                    event.preventDefault();
-                                    $ef.select($this, "end");
-                                    break;
-                                case 37:
-                                    event.preventDefault();
-                                    $ef.select($this, "start");
-                                    break
-                                case 39:
-                                    event.preventDefault();
-                                    $ef.select($this, "end");
-                                    break;
-                            }
+                            return true;
+                        }
+
                     }
                 }
+
+                // check escape (cancel and reset editing)
+                if(event.keyCode == 27) {
+                    event.preventDefault();
+                    $this.html($this.data("oldHtml"));
+                    $this.blur();
+                    return true;
+                }
+
+                // check return (newline)
+                if(event.which == 13 && !$ef.can($this, "newline")) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                // check command return (commit)
+                if(event.metaKey && event.which == 13) {
+                    event.preventDefault();
+                    $this.blur();
+                    return true;
+                }
+
+                // check command a (select all)
+                if(event.metaKey && event.which == 97) {
+                    event.preventDefault();
+                    $ef.select("all");
+                    return true;
+                }
+
+                // check command left/up (move to beginning)
+                if(event.metaKey && (event.keyCode == 37 || event.keyCode == 38)) {
+                    event.preventDefault();
+                    $ef.select("start");
+                    return true;
+                }
+
+                // check command right/down (move to end)
+                if(event.metaKey && (event.keyCode == 39 || event.keyCode == 40)) {
+                    event.preventDefault();
+                    $ef.select("end");
+                    return true;
+                }
+
             });
 
             $this.keyup(function(event) {
