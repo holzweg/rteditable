@@ -31,12 +31,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand editme" href="#" data-slug="title"><?php echo $backend->__("title"); ?></a>
+          <a class="brand" href="#" data-slug="title"><?php echo $backend->__("title"); ?></a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><a href="#" class="editme" data-rtgroup="home" data-slug="home"><?php echo $backend->__("home"); ?></a></li>
-              <li><a class="editme" href="#about" data-slug="about"><?php echo $backend->__("about"); ?></a></li>
-              <li><a class="editme" href="#contact" data-slug="contact"><?php echo $backend->__("contact"); ?></a></li>
+              <li class="active"><a href="#" data-rtgroup="home" data-slug="home"><?php echo $backend->__("home"); ?></a></li>
+              <li><a href="#about" data-slug="about"><?php echo $backend->__("about"); ?></a></li>
+              <li><a href="#contact" data-slug="contact"><?php echo $backend->__("contact"); ?></a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -47,39 +47,40 @@
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="hero-unit">
-        <h1 class="editme" data-slug="title"><?php echo $backend->__("title"); ?></h1>
-        <p class="editme" data-slug="maindesc"><?php echo $backend->__("maindesc"); ?></p>
-        <p><a class="btn btn-primary btn-large editme" data-slug="learnmore"><?php echo $backend->__("learnmore"); ?></a></p>
+        <h1 data-slug="title"><?php echo $backend->__("title"); ?></h1>
+        <p data-slug="maindesc"><?php echo $backend->__("maindesc"); ?></p>
+        <p><a class="btn btn-primary btn-large" data-slug="learnmore"><?php echo $backend->__("learnmore"); ?></a></p>
       </div>
 
       <ul class="breadcrumb">
-          <li><span class="editme" data-slug="youarehere"><?php echo $backend->__("youarehere"); ?></span>: <span class="editme" data-slug="home"><?php echo $backend->__("home"); ?></span></li>
+          <li><span data-slug="youarehere"><?php echo $backend->__("youarehere"); ?></span>: <span data-slug="home"><?php echo $backend->__("home"); ?></span></li>
       </ul>
 
       <!-- Example row of columns -->
       <div class="row">
         <div class="span4">
-          <h2 class="editme" data-slug="title"><?php echo $backend->__("title"); ?></h2>
-           <p class="editme" data-slug="maindesc"><?php echo $backend->__("maindesc"); ?></p>
-          <p><a class="btn editme" data-slug="readmore" href="#"><?php echo $backend->__("readmore"); ?></a></p>
+          <h2 data-slug="title"><?php echo $backend->__("title"); ?></h2>
+           <p data-slug="maindesc"><?php echo $backend->__("maindesc"); ?></p>
+          <p><a class="btn" data-slug="readmore" href="#"><?php echo $backend->__("readmore"); ?></a></p>
         </div>
         <div class="span4">
-          <h2 class="editme" data-slug="heading1"><?php echo $backend->__("heading1"); ?></h2>
-           <p class="editme" data-slug="text1"><?php echo $backend->__("text1"); ?></p>
-          <p><a class="btn editme" data-slug="readmore" href="#"><?php echo $backend->__("readmore"); ?></a></p>
+          <h2 data-slug="heading1"><?php echo $backend->__("heading1"); ?></h2>
+           <p data-slug="text1"><?php echo $backend->__("text1"); ?></p>
+          <p><a class="btn" data-slug="readmore" href="#"><?php echo $backend->__("readmore"); ?></a></p>
        </div>
         <div class="span4">
-          <h2 class="editme" data-slug="heading2"><?php echo $backend->__("heading2"); ?></h2>
-          <p class="editme" data-slug="text2"><?php echo $backend->__("text2"); ?></p>
-          <p><a class="btn editme" data-slug="readmore" href="#"><?php echo $backend->__("readmore"); ?></a></p>
+          <h2 data-slug="heading2"><?php echo $backend->__("heading2"); ?></h2>
+          <p data-slug="text2"><?php echo $backend->__("text2"); ?></p>
+          <p><a class="btn" data-slug="readmore" href="#"><?php echo $backend->__("readmore"); ?></a></p>
         </div>
       </div>
 
       <hr>
 
       <footer>
-        <p class="editme" data-slug="copyright"><?php echo $backend->__("copyright"); ?></p>
-        <p class="editme well" data-slug="title"><?php echo $backend->__("title"); ?></p>
+        <p data-slug="copyright"><?php echo $backend->__("copyright"); ?></p>
+        <p class="well" data-slug="title"><?php echo $backend->__("title"); ?></p>
+        <p><a href="index.php?reset" class="btn btn-danger btn-large">Reset all translations</a></p>
       </footer>
 
     </div>
@@ -102,7 +103,7 @@
     <script src="../src/jquery.rteditable.js"></script>
     <script type="text/javascript" charset="utf-8">
         $().ready(function() {
-            $('.editme').rteditable({
+            $('[data-slug]').rteditable({
                 url: "index.php?post=true"
             });
         });
