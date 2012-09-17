@@ -2,6 +2,17 @@
 
     $.fn.rteditable = function(options) {
 
+        if(options == "stop") {
+            this.unbind("focus");
+            this.unbind("hover");
+            this.unbind("blur");
+            this.unbind("keypress");
+            this.unbind("keyup");
+            this.unbind("click");
+            this.attr("contentEditable", "false");
+            return true;
+        }
+
         // Set defaults
         var defaults = {
             url: '/',
@@ -84,10 +95,18 @@
                     var position = $f.getCaretPosition();
                     if(!(position.left == 0 && position.top == 0)) {
 
-                        // Get text element
-                        var selection = window.getSelection();
-                        var nodeName = $(selection.anchorNode).parent()[0].nodeName.toLowerCase();
-                        $sel.html(nodeName);
+                        // Get token
+                        var token = $i.editing.data("token");
+                        if(token) {
+                            $sel.html(token);
+                        }else{
+                            // Get text element
+                            var selection = window.getSelection();
+                            var nodeName = $(selection.anchorNode).parent()[0].nodeName.toLowerCase();
+                            $sel.html(nodeName);
+                        }
+
+
                         $sel.css(position);
                         $sel.show();
                     }
@@ -299,6 +318,7 @@
             $this.keypress(function(event) {
                 $this = $(this);
 
+
                 // Character Map
                 var mapString = "";
                 if(event.ctrlKey) { mapString = mapString + "$"; }
@@ -315,7 +335,9 @@
                             var commandArray = options.shortcuts[mapString].split("|");
                             var command = commandArray.shift();
                             var argument = commandArray.shift();
-                            document.execCommand(command, false);
+                            if($ef.can($this, "format")) {
+                                document.execCommand(command, false);
+                            }
                             event.preventDefault();
                             return true;
                         }
@@ -374,10 +396,18 @@
 
                 // Update group nodes
                 if($this.data("slug")) {
-                    var others = $("[data-slug="+$this.data("slug")+"]");
+                    var others = $("[data-slug="+$this.data("slug")+"]").not($this);
+
+                    var html = $this.html();
+                    // Remove <br> at end of text
+                    if(html.substr(-4) == "<br>") {
+                        console.log(html);
+                        html = html.substr(0, html.length - 4);
+                        console.log(html);
+                    }
                     others.each(function() {
-                        if($(this).html() != $this.html()) {
-                            $(this).html($this.html());
+                        if($(this).html() != html) {
+                            $(this).html(html);
                         }
                     });
 
@@ -390,9 +420,7 @@
                 $f.updateOutline();
             });
 
-            $this.change(function() {
-            });
-
         });
+
     };
 })(jQuery);
